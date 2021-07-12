@@ -9,6 +9,18 @@ module.exports = {
         filename: 'canvas_bundle.js',
         clean: true
     },
+    module: {
+        rules: [
+            {
+                test: /\.js$/,
+                exclude: /node_modules/,
+                use: {
+                    // without additional settings, this will reference .babelrc
+                    loader: 'babel-loader'
+                }
+            }
+        ]
+    },
     plugins: [
         new HtmlWebpackPlugin({
             filename: 'index.html',
@@ -16,9 +28,8 @@ module.exports = {
         })
     ],
     devServer: {
-        contentBase: path.join(__dirname, 'public'),
-        port: 3000
+        contentBase: path.join(__dirname, 'dist'),
+        // port: 3000
     },
-    // watch: true,
     devtool: 'source-map'
 };

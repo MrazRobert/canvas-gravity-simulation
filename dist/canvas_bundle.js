@@ -8,15 +8,17 @@
 /***/ ((module) => {
 
 function randomIntFromRange(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
+  return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
 function randomColor(colors) {
-  return colors[Math.floor(Math.random() * colors.length)]
+  return colors[Math.floor(Math.random() * colors.length)];
 }
 
-module.exports = { randomIntFromRange, randomColor }
-
+module.exports = {
+  randomIntFromRange: randomIntFromRange,
+  randomColor: randomColor
+};
 
 /***/ })
 
@@ -98,107 +100,112 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./utils */ "./src/utils.js");
 /* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_utils__WEBPACK_IMPORTED_MODULE_0__);
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
 
-const canvas = document.querySelector('canvas')
-const c = canvas.getContext('2d')
-
-canvas.width = innerWidth
-canvas.height = innerHeight
-
-const mouse = {
+var canvas = document.querySelector('canvas');
+var c = canvas.getContext('2d');
+canvas.width = innerWidth;
+canvas.height = innerHeight;
+var mouse = {
   x: innerWidth / 2,
   y: innerHeight / 2
-}
+};
+var colors = ['#FA0C8F', '#FADE19', '#AE01FA', '#21FA19', '#310CFA'];
+var gravity = 0.2;
+var friction = 0.98; // Event Listeners
 
-const colors = ['#FA0C8F', '#FADE19', '#AE01FA', '#21FA19', '#310CFA']
+addEventListener('mousemove', function (event) {
+  mouse.x = event.clientX;
+  mouse.y = event.clientY;
+});
+addEventListener('resize', function () {
+  canvas.width = innerWidth;
+  canvas.height = innerHeight;
+  init();
+});
+addEventListener('click', function () {
+  init();
+}); // Objects
 
-const gravity = 0.2;
-const friction = 0.98;
+var Ball = /*#__PURE__*/function () {
+  function Ball(x, y, dx, dy, radius, color) {
+    _classCallCheck(this, Ball);
 
-// Event Listeners
-addEventListener('mousemove', (event) => {
-  mouse.x = event.clientX
-  mouse.y = event.clientY
-})
-
-addEventListener('resize', () => {
-  canvas.width = innerWidth
-  canvas.height = innerHeight
-
-  init()
-})
-
-addEventListener('click', () => {
-  init()
-})
-
-// Objects
-class Ball {
-  constructor(x, y, dx, dy, radius, color) {
-    this.x = x
-    this.y = y
-    this.dx = dx
-    this.dy = dy
-    this.radius = radius
-    this.color = color
+    this.x = x;
+    this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.radius = radius;
+    this.color = color;
   }
 
-  draw() {
-    c.beginPath()
-    c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false)
-    c.fillStyle = this.color
-    c.fill()
-    c.stroke()
-    c.closePath()
-  }
-
-  update() {
-    if (this.y + this.radius + this.dy > canvas.height) {
-      this.dy = -this.dy * friction
-    } else {
-      this.dy += gravity;
+  _createClass(Ball, [{
+    key: "draw",
+    value: function draw() {
+      c.beginPath();
+      c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+      c.fillStyle = this.color;
+      c.fill();
+      c.stroke();
+      c.closePath();
     }
+  }, {
+    key: "update",
+    value: function update() {
+      if (this.y + this.radius + this.dy > canvas.height) {
+        this.dy = -this.dy * friction;
+      } else {
+        this.dy += gravity;
+      }
 
-    if (this.x + this.radius + this.dx > canvas.width
-      || this.x - this.radius + this.dx <= 0) {
-      this.dx = -this.dx
+      if (this.x + this.radius + this.dx > canvas.width || this.x - this.radius + this.dx <= 0) {
+        this.dx = -this.dx;
+      }
+
+      this.x += this.dx;
+      this.y += this.dy;
+      this.draw();
     }
+  }]);
 
-    this.x += this.dx
-    this.y += this.dy
-    this.draw()
-  }
-}
+  return Ball;
+}(); // Implementation
 
-// Implementation
-let balls
+
+var balls;
+
 function init() {
-  balls = []
-  for (let i = 0; i < 400; i++) {
-    const radius = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(4, 20);
-    const x = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(radius, canvas.width - radius);
-    const y = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(0, canvas.height - radius);
-    const dx = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-3, 3);
-    const dy = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-2, 2);
-    const color = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomColor(colors)
+  balls = [];
+
+  for (var i = 0; i < 400; i++) {
+    var radius = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(4, 20);
+    var x = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(radius, canvas.width - radius);
+    var y = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(0, canvas.height - radius);
+    var dx = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-3, 3);
+    var dy = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomIntFromRange(-2, 2);
+    var color = _utils__WEBPACK_IMPORTED_MODULE_0___default().randomColor(colors);
     balls.push(new Ball(x, y, dx, dy, radius, color));
   }
-}
+} // Animation Loop
 
-// Animation Loop
+
 function animate() {
-  requestAnimationFrame(animate)
-  c.fillStyle = 'rgba(0, 0, 0, 0.8)'
-  c.fillRect(0, 0, canvas.width, canvas.height)
-  for (let i = 1; i < balls.length; i++) {
+  requestAnimationFrame(animate);
+  c.fillStyle = 'rgba(0, 0, 0, 0.8)';
+  c.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (var i = 1; i < balls.length; i++) {
     balls[i].update();
   }
 }
 
-init()
-animate()
-
+init();
+animate();
 })();
 
 /******/ })()
