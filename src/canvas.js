@@ -1,4 +1,6 @@
 import utils from './utils'
+import './style.scss'
+import 'font-awesome/css/font-awesome.css'
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
