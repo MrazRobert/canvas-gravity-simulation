@@ -1,6 +1,29 @@
-import utils from './utils'
-import './style.scss'
-import 'font-awesome/css/font-awesome.css'
+import utils from './utils';
+import './style.scss';
+import 'font-awesome/css/font-awesome.css';
+import * as dat from 'dat.gui';
+
+const gui = new dat.GUI({ name: 'gravity', closed: true, hideable: true });
+gui.domElement.id = 'gui';
+
+const simulation = {
+  alpha: 0.8,
+  gravity: 0.2,
+  friction: 0.98,
+  balls: {
+    count: 400,
+    minRadius: 4,
+    maxRadius: 20
+  }
+}
+
+gui.add(simulation, 'alpha', 0, 1)
+gui.add(simulation, 'gravity', 0, 5, 0.01).onChange(() => setRadius())
+gui.add(simulation, 'friction', 0, 1.1, 0.01).onChange(() => setRadius())
+const ballProperties = gui.addFolder('ball properties')
+ballProperties.add(simulation.balls, 'count', 0, 600, 1).onChange(() => ballAdderAndRemover())
+ballProperties.add(simulation.balls, 'minRadius', 4, 30, 1).onChange(() => setRadius())
+ballProperties.add(simulation.balls, 'maxRadius', 4, 30, 1).onChange(() => setRadius())
 
 const canvas = document.querySelector('canvas')
 const c = canvas.getContext('2d')
@@ -15,9 +38,6 @@ const mouse = {
 
 const colors = ['#FA0C8F', '#FADE19', '#AE01FA', '#21FA19', '#310CFA']
 
-const gravity = 0.2;
-const friction = 0.98;
-
 // Event Listeners
 addEventListener('mousemove', (event) => {
   mouse.x = event.clientX
@@ -31,7 +51,9 @@ addEventListener('resize', () => {
   init()
 })
 
-addEventListener('click', () => {
+const pElement = document.getElementById("click")
+
+pElement.addEventListener('click', () => {
   init()
 })
 
@@ -57,9 +79,9 @@ class Ball {
 
   update() {
     if (this.y + this.radius + this.dy > canvas.height) {
-      this.dy = -this.dy * friction
+      this.dy = -this.dy * simulation.friction
     } else {
-      this.dy += gravity;
+      this.dy += simulation.gravity;
     }
 
     if (this.x + this.radius + this.dx > canvas.width
@@ -77,23 +99,60 @@ class Ball {
 let balls
 function init() {
   balls = []
-  for (let i = 0; i < 400; i++) {
-    const radius = utils.randomIntFromRange(4, 20);
-    const x = utils.randomIntFromRange(radius, canvas.width - radius);
-    const y = utils.randomIntFromRange(0, canvas.height - radius);
-    const dx = utils.randomIntFromRange(-3, 3);
-    const dy = utils.randomIntFromRange(-2, 2);
-    const color = utils.randomColor(colors)
-    balls.push(new Ball(x, y, dx, dy, radius, color));
+  for (let i = 0; i < simulation.balls.count; i++) {
+    balls.push(createBall());
   }
+}
+
+// Create a new ball
+function createBall() {
+  const {minRadius, maxRadius} = simulation.balls
+  const radius = utils.randomIntFromRange(minRadius, maxRadius);
+  const x = utils.randomIntFromRange(radius, canvas.width - radius);
+  const y = utils.randomIntFromRange(0, canvas.height - radius);
+  const dx = utils.randomIntFromRange(-3, 3);
+  const dy = utils.randomIntFromRange(-2, 2);
+  const color = utils.randomColor(colors)
+  return new Ball(x, y, dx, dy, radius, color)
+}
+
+// Adding and removing balls
+function ballAdderAndRemover() {
+  const ballsLength = balls.length
+  const ballsCount = Math.abs(ballsLength - simulation.balls.count)
+  if (ballsLength < simulation.balls.count) {
+    for (let i = 0; i < ballsCount; i++) {
+      balls.push(createBall())
+    }
+  }
+  if (ballsLength > simulation.balls.count) {
+    for (let i = 0; i < ballsCount; i++) {
+      balls.pop()
+    }
+  }
+}
+
+// setting the minimum and the maximum radius of the balls
+function setRadius() {
+  const {minRadius, maxRadius} = simulation.balls
+  balls.forEach((ball, index) => {
+    if (ball.radius < minRadius) {
+      balls.splice(index, 1)
+      balls.push(createBall())
+    }
+    if (ball.radius > maxRadius) {
+      balls.splice(index, 1)
+      balls.push(createBall())
+    }
+  })
 }
 
 // Animation Loop
 function animate() {
   requestAnimationFrame(animate)
-  c.fillStyle = 'rgba(0, 0, 0, 0.8)'
+  c.fillStyle = `rgba(0, 0, 0, ${simulation.alpha})`
   c.fillRect(0, 0, canvas.width, canvas.height)
-  for (let i = 1; i < balls.length; i++) {
+  for (let i = 0; i < balls.length; i++) {
     balls[i].update();
   }
 }
