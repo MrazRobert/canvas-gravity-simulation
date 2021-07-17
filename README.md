@@ -9,6 +9,9 @@
 
 ## Description
 
+<p align="center">
+<img src="./public/image/gravity_simulation.gif" width="80%"></p>
+
 <p>HTML5 Canvas, JavaScript and Webpack 5</p>
 
 ## Project setup
